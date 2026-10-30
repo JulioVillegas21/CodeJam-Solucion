@@ -1,0 +1,7 @@
+{
+  "rutas": [
+    { "vehiculo": "V1", "paradas": [2, 1, 10, "DEPOSITO", 8, 3] },
+    { "vehiculo": "V2", "paradas": [6, 5] },
+    { "vehiculo": "V3", "paradas": [4, 9, 7] }
+  ]
+}

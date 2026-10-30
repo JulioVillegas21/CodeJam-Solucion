@@ -16,7 +16,7 @@ from ruteo_premium import calcular_rutas_para_k_autos_premium
 
 def resolver_premium(carpeta_datos: str = "Datos") -> dict:
     base_dir = Path(__file__).resolve().parent
-    ruta_datos = Path(carpeta_datos) if Path(carpeta_datos).is_Absolute() if hasattr(Path(carpeta_datos), "is_Absolute") else (Path(carpeta_datos) if Path(carpeta_datos).is_absolute() else base_dir / carpeta_datos)
+    ruta_datos = Path(carpeta_datos) if Path(carpeta_datos).is_absolute() else base_dir / carpeta_datos
 
     mundo = json.loads((ruta_datos / "mundo.json").read_text(encoding="utf-8-sig"))
     lista_pedidos = json.loads((ruta_datos / "pedidos.json").read_text(encoding="utf-8-sig"))

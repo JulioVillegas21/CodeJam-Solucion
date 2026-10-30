@@ -26,8 +26,11 @@ def como_texto(r: Resultado, mundo: Mundo, detalle: bool = False) -> str:
         f"  tiempo     {m['makespan']} min × {_n(k.por_minuto_total)} = {_n(c['tiempo'])}",
         f"  fallas     {m['fallidos']} × {_n(k.por_falla)} = {_n(c['fallas'])}",
     ]
+    lineas.append(f"  premium    {m['minutos_premium']} min × {_n(k.por_minuto_premium)} = {_n(c['premium'])}")
     entregas = f"Entregas: {m['entregados']}/{m['pedidos']} entregados"
     lineas += ["", f"{entregas} · {m['sin_asignar']} sin asignar"]
+    if m["premium_total"]:
+        lineas.append(f"Premium: {m['premium_entregados']}/{m['premium_total']} entregados")
     lineas.append(f"Vuelve el último vehículo: {a_hora(m['hora_fin'])}")
     if r.no_asignados:
         lineas.append(f"Sin asignar: {', '.join(map(str, r.no_asignados))}")

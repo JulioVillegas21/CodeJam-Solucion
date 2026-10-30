@@ -67,6 +67,7 @@ class TestCalculoBasico(unittest.TestCase):
         self.assertEqual(r.visitas[0].llegada, a_minutos("08:15"))
         self.assertEqual(r.visitas[1].llegada, a_minutos("08:29"))
         esperado = {"distancia": 48, "vehiculos": 60, "tiempo": 58, "fallas": 0, "total": 166}
+        esperado["premium"] = 0
         self.assertEqual(r.costo, esperado)
 
     def test_dos_vehiculos_suman_distancia_y_costo_fijo(self):
@@ -90,6 +91,14 @@ class TestCalculoBasico(unittest.TestCase):
         self.assertEqual(r.costo["fallas"], 200)
 
 
+class TestPremium(unittest.TestCase):
+    def test_minutos_premium(self):
+        pedidos = [dict(DOS_PEDIDOS[0]), dict(DOS_PEDIDOS[1], premium=True)]
+        primero = correr(pedidos, UN_VEHICULO, [{"vehiculo": "A", "paradas": [2, 1]}])
+        despues = correr(pedidos, UN_VEHICULO, [{"vehiculo": "A", "paradas": [1, 2]}])
+        self.assertEqual(primero.metricas["minutos_premium"], 24)   # 8 cuadras × 3
+        self.assertEqual(despues.metricas["minutos_premium"], 29)   # 08:29 - 08:00
+        self.assertLess(primero.costo["premium"], despues.costo["premium"])
 
 
 
@@ -153,10 +162,19 @@ class TestFormatos(unittest.TestCase):
         self.assertEqual((p[1].peso, p[2].peso), (10, 5))
         self.assertEqual(v["A"].min_por_cuadra, 3)
 
+    def test_csv_con_campos_opcionales_vacios(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            (d / "pedidos.csv").write_text("id;x;y;peso;premium\n1;2;3;10;\n2;5;3;5;1\n")
+            (d / "vehiculos.csv").write_text("id\nA\n")
+            m, p, v = cargar_datos(d)
+        self.assertFalse(p[1].premium)
+        self.assertTrue(p[2].premium)
 
 
 # Costo del plan de ejemplo con los campos de cada etapa develada.
 TOTAL_EJEMPLO = 1013
+TOTAL_EJEMPLO = 1124
 
 
 class TestEjemplo(unittest.TestCase):

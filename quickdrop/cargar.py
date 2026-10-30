@@ -111,6 +111,7 @@ CAMPOS_MUNDO = [
     ("costo_por_minuto_total", "numero", 1),
     ("costo_por_falla", "numero", 200),
 ]
+CAMPOS_MUNDO += [("costo_por_minuto_premium", "numero", 1)]
 
 
 def mundo_desde_dict(d: dict) -> Mundo:
@@ -132,6 +133,7 @@ def mundo_desde_dict(d: dict) -> Mundo:
             por_minuto_total=v["costo_por_minuto_total"], por_falla=v["costo_por_falla"],
         ),
     )
+    m.costos.por_minuto_premium = v["costo_por_minuto_premium"]
     if m.ancho <= 0 or m.alto <= 0:
         raise ErrorDatos("mundo: la grilla debe tener tamaño positivo")
     if not m.contiene(m.deposito):
@@ -151,12 +153,14 @@ def mundo_a_dict(m: Mundo) -> dict:
         "costo_por_cuadra": c.por_cuadra, "costo_por_vehiculo": c.por_vehiculo,
         "costo_por_minuto_total": c.por_minuto_total, "costo_por_falla": c.por_falla,
     }
+    d["costo_por_minuto_premium"] = c.por_minuto_premium
     return d
 
 
 # --------------------------------------------------------------------------- pedidos
 
 CAMPOS_PEDIDO = ["id", "x", "y", "peso"]
+CAMPOS_PEDIDO += ["premium"]
 
 
 def pedidos_desde_filas(filas, mundo: Mundo) -> dict:
@@ -174,6 +178,7 @@ def pedidos_desde_filas(filas, mundo: Mundo) -> dict:
         pos = Punto(_entero(f["x"], f"{donde}, x"), _entero(f["y"], f"{donde}, y"))
         peso = _entero(f["peso"], f"{donde}, peso")
         extra = {}
+        extra["premium"] = False if _vacio(f.get("premium")) else _booleano(f["premium"], f"{donde}, premium")
         if pid in pedidos:
             raise ErrorDatos(f"{donde}: id repetido")
         if not mundo.contiene(pos):
@@ -188,9 +193,13 @@ def pedidos_a_filas(pedidos: dict) -> tuple:
     """Devuelve (columnas, filas). Solo incluye columnas opcionales si algún pedido las usa."""
     lista = list(pedidos.values())
     columnas = ["id", "x", "y", "peso"]
+    if any(p.premium for p in lista):
+        columnas.append("premium")
     filas = []
     for p in lista:
         f = {"id": p.id, "x": p.pos.x, "y": p.pos.y, "peso": p.peso}
+        if "premium" in columnas:
+            f["premium"] = p.premium
         filas.append(f)
     return columnas, filas
 

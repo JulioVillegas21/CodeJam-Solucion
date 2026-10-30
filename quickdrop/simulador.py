@@ -80,6 +80,8 @@ def simular(mundo: Mundo, pedidos: dict, vehiculos: dict, plan: Plan) -> Resulta
     distancia_total = 0
     fin_ultimo = mundo.hora_salida
     entregados = 0
+    premium_total = sum(1 for p in pedidos.values() if p.premium)
+    premium_entregados = minutos_premium = 0
 
     for ruta in plan.rutas:
         v = vehiculos[ruta.vehiculo]
@@ -109,6 +111,9 @@ def simular(mundo: Mundo, pedidos: dict, vehiculos: dict, plan: Plan) -> Resulta
             inicio = llegada
             t = inicio + mundo.tiempo_servicio
             entregados += 1
+            if p.premium:
+                premium_entregados += 1
+                minutos_premium += inicio - mundo.hora_salida
             visitas.append(Visita(v.id, viaje, p.id, p.pos.x, p.pos.y, d, llegada, inicio - llegada, inicio, t, ENTREGADO))
 
         d = mundo.distancia(pos, dep)
@@ -127,6 +132,7 @@ def simular(mundo: Mundo, pedidos: dict, vehiculos: dict, plan: Plan) -> Resulta
         "tiempo": makespan * c.por_minuto_total,
         "fallas": fallidos * c.por_falla,
     }
+    componentes["premium"] = minutos_premium * c.por_minuto_premium
     componentes["total"] = sum(componentes.values())
 
     metricas = {
@@ -139,4 +145,6 @@ def simular(mundo: Mundo, pedidos: dict, vehiculos: dict, plan: Plan) -> Resulta
         "makespan": makespan,
         "hora_fin": fin_ultimo,
     }
+    metricas.update(premium_total=premium_total, premium_entregados=premium_entregados,
+                    minutos_premium=minutos_premium)
     return Resultado(True, [], visitas, no_asignados, metricas, componentes)

@@ -44,6 +44,7 @@ datos/<nombre>/
 | `costo_por_vehiculo` | número | 60 | Costo fijo de usar un vehículo |
 | `costo_por_minuto_total` | número | 1 | Peso del tiempo total (makespan) |
 | `costo_por_falla` | número | 200 | Penalización por cada pedido que falla |
+| `costo_por_minuto_premium` | número | 1 | Peso de la demora de los pedidos premium |
 
 JSON: un objeto plano con esos campos.
 
@@ -63,6 +64,7 @@ CSV: dos columnas, `clave,valor`, una fila por campo.
 | `id` | entero | sí | Identificador único |
 | `x`, `y` | entero | sí | Ubicación del cliente |
 | `peso` | entero | sí | Peso del paquete (kg) |
+| `premium` | booleano | no (falso) | Cliente premium: cuenta cuánto tarda en recibir (§6) |
 
 ```json
 [
@@ -76,6 +78,9 @@ id,x,y,peso
 1,15,8,12
 2,6,14,4
 ```
+
+Pedido premium: `{ "id": 2, "x": 6, "y": 14, "peso": 4, "premium": true }`; en CSV, la columna
+`premium` con `1` o `0`.
 
 ### 2.3 Vehículos
 
@@ -100,6 +105,7 @@ V2
 
 - Un campo opcional puede **faltar**, valer `null` (JSON) o estar **vacío** (CSV): las tres
   formas significan lo mismo.
+- Booleanos en CSV: `1`/`0` (también se aceptan `true`/`false`, `si`/`no`).
 - CSV: separador `,` (se acepta `;`), codificación UTF-8, primera fila con encabezados.
 - Si un archivo tiene campos que tu programa no conoce, ignoralos.
 
@@ -168,6 +174,7 @@ costo = costo_por_cuadra         × distancia total (cuadras, todos los vehícul
       + costo fijo               de cada vehículo usado (con al menos un pedido)
       + costo_por_minuto_total   × makespan (minutos desde la salida hasta que vuelve el último vehículo)
       + costo_por_falla          × pedidos que fallan (§5)
+      + costo_por_minuto_premium × Σ minutos desde la salida hasta la entrega de cada premium entregado
 ```
 
 Puntaje por dataset para el ranking, dentro de cada nivel:

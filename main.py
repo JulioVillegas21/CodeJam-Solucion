@@ -131,6 +131,11 @@ def resolver_dataset(carpeta_datos: str, archivo_salida: str = None) -> dict:
 
 
 if __name__ == "__main__":
-    carpeta = sys.argv[1] if len(sys.argv) > 1 else "datos/ejemplo"
+    if len(sys.argv) > 1:
+        carpeta = sys.argv[1]
+    elif (Path(__file__).resolve().parent / "Datos" / "mundo.json").exists():
+        carpeta = "Datos"
+    else:
+        carpeta = "datos/ejemplo"
     salida = sys.argv[2] if len(sys.argv) > 2 else None
     resolver_dataset(carpeta, salida)

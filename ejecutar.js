@@ -252,6 +252,9 @@ function resolver(carpeta, archivoSalida) {
   console.log("=".repeat(68));
 }
 
-const carpetaArg = process.argv[2] || path.join(__dirname, "datos", "ejemplo");
+const defaultDir = fs.existsSync(path.join(__dirname, "Datos", "mundo.json"))
+  ? path.join(__dirname, "Datos")
+  : path.join(__dirname, "datos", "ejemplo");
+const carpetaArg = process.argv[2] || defaultDir;
 const salidaArg = process.argv[3] || null;
 resolver(carpetaArg, salidaArg);

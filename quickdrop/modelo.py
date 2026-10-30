@@ -19,6 +19,7 @@ class Costos:
     por_vehiculo: float = 60
     por_minuto_total: float = 1
     por_falla: float = 200
+    por_minuto_premium: float = 1
 
 
 @dataclass
@@ -45,6 +46,7 @@ class Pedido:
     id: int
     pos: Punto
     peso: int
+    premium: bool = False
 
 
 @dataclass
